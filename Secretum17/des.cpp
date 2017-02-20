@@ -12,6 +12,7 @@ Data Encryption
 7. IP의 역을 수행하여 64bit 암호문 출력
 */
 
+#include "stdafx.h"
 #include "wrapper.h"
 #include "des.h"
 

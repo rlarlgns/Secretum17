@@ -6,6 +6,7 @@ Step 3. Initialize MD Buffer
 Step 4. Process Message in 16-Word Blocks
 Step 5. Output
 */
+#include "stdafx.h"
 #include "wrapper.h"
 #include "md5.h"
 #include <string>
