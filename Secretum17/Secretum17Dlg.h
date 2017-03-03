@@ -39,8 +39,12 @@ public:
 	afx_msg void OnBnClickedEncodeBtn();
 	afx_msg void OnBnClickedDecodeBtn();
 
-	// 파일 세팅 체크
+	/* 파일 세팅 체크 */
 	bool check_file_flag = 0, check_keyfile_flag = 0;
+	/* 현재 암호화 알고리즘 종류 */
+	bool algorithm;
+	/* 파일 이름 */
+	char *file_name, *keyfile_name;
 
 	int m_Radio;
 	afx_msg void OnBnClickedRadio1();
@@ -53,9 +57,10 @@ public:
 	CButton file_select_btn;
 	CEdit file_path_btn;
 
-	void set_dialog(bool al_mode);
+	void set_dialog(bool al);
 	CButton encryption_btn;
 	CButton decryption_btn;
-	void init_mode();
+	void init_mode(int current, int al_mode);
 	afx_msg void OnEnChangeEdit2();
+	afx_msg void OnBnClickedRadio3();
 };

@@ -7,10 +7,18 @@ Step 4. Process Message in 16-Word Blocks
 Step 5. Output
 */
 #include "stdafx.h"
-#include "wrapper.h"
 #include "md5.h"
+
 #include <string>
 #include <cstring>
+
+/* PADDING : 최대 패딩 비트 512bit ( 64 * 8 ) */
+static byte PADDING[64] = {
+	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
 /*
 S : MD5Trandform routine.
 1. round 과정의 shift 횟수 지정 값
@@ -291,12 +299,12 @@ void MD5::Decode(bit32 *output, byte *input, unsigned int input_len) {
 }
 
 
-char MD5::hb2hex(unsigned char hb) {
+char hb2hex(unsigned char hb) {
 	hb = hb & 0xF;
 	return hb < 10 ? '0' + hb : hb - 10 + 'a';
 }
 
-string MD5::MD5_file() {
+void MD5::Encryption() {
 
 	MD5_init();
 	size_t len = 0;
@@ -313,7 +321,7 @@ string MD5::MD5_file() {
 
 	cout << res << endl;
 	//fwrite(res.c_str(), sizeof(char) , res.length, output_file);
-	return res;
+	MD5_result = res;
 }
 
 

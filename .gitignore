@@ -10,3 +10,15 @@
 *.sdf
 *.ilk
 *.exe
+*.txt
+*.filters
+*.res
+Secretum17/Secretum17.vcxproj.filters
+*.filters
+Secretum17/Secretum17.vcxproj
+Secretum17/keyfile_tmp.key
+*.opensdf
+Secretum17/Secretum17.aps
+Secretum17/Secretum17.vcxproj
+*.filters
+Secretum17/x64/Debug/Secretum17.res

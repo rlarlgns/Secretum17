@@ -13,15 +13,19 @@
 
 #include <locale>
 
+#define BLOCK 1
+#define HASH 0
 #define DES_MODE 0
 #define MD5_MODE 1
+#define AES_MODE 2
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-DES des;
-MD5 md5;
+/* 부모 클래스 포인터 선언 */
+Block_AL* block_al;
+Hash_AL* hash_al;
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
@@ -94,6 +98,7 @@ BEGIN_MESSAGE_MAP(CSecretum17Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_DECODE_BTN, &CSecretum17Dlg::OnBnClickedDecodeBtn)
 	ON_BN_CLICKED(IDC_RADIO1, &CSecretum17Dlg::OnBnClickedRadio1)
 	ON_BN_CLICKED(IDC_RADIO2, &CSecretum17Dlg::OnBnClickedRadio2)
+	ON_BN_CLICKED(IDC_RADIO3, &CSecretum17Dlg::OnBnClickedRadio3)
 END_MESSAGE_MAP()
 
 
@@ -132,6 +137,9 @@ BOOL CSecretum17Dlg::OnInitDialog()
 
 	/* 한글 경로 에러 체크 */
 	setlocale(LC_ALL, "Korean");
+
+	/* radio btn 1 func click */
+	OnBnClickedRadio1();
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -203,29 +211,12 @@ void CSecretum17Dlg::OnBnClickedFileopen()
 		CString m_filename = dlg.GetFileName();
 		
 		/* CString -> char* 형변환 */
-		char* temp_path = (char*)malloc(m_filename.GetLength());
+		file_name = (char*)malloc(m_filename.GetLength());
 		size_t CharactersConverted = 0;
-		wcstombs_s(&CharactersConverted, temp_path, m_filename.GetLength() + 1, m_filename, _TRUNCATE);
-		
-		/* 파일을 넘겨줌 */
-		if (m_Radio == DES_MODE) {
-			
-			if (des.Get_file(temp_path)) {
-				MessageBox(_T("get_file error"));
-			}
-		}
-		else if (m_Radio == MD5_MODE) {
+		wcstombs_s(&CharactersConverted, file_name, m_filename.GetLength() + 1, m_filename, _TRUNCATE);
 
-			if (md5.Get_file(temp_path)) {
-				MessageBox(_T("get_file error"));
-			}
-		}
-
-		
-		/* 파일 전송 체크 */
+		/* 파일 체크 */
 		check_file_flag = 1;
-		// 동적할당 후 free 해줄려고 하는데 오류가 난다.
-		//free(temp_path);
 	}
 }
 
@@ -245,24 +236,18 @@ void CSecretum17Dlg::OnBnClickedKeyFileopen()
 		CString m_filename = dlg.GetFileName();
 
 		/* CString -> char* 형변환 */
-		char* temp_path = (char*)malloc(m_filename.GetLength());
+		char* keyfile_name = (char*)malloc(m_filename.GetLength());
 		size_t CharactersConverted = 0;
-		wcstombs_s(&CharactersConverted, temp_path, m_filename.GetLength() + 1, m_filename, _TRUNCATE);
-
-		/* key 파일을 넘겨줌 */
-		if (des.Get_keyfile(temp_path)) {
-			MessageBox(_T("get_keyfile error"));
-		}
+		wcstombs_s(&CharactersConverted, keyfile_name, m_filename.GetLength() + 1, m_filename, _TRUNCATE);
 		
-		/* 파일 전송 체크 */
+		/* 파일 체크 */
 		check_keyfile_flag = 1;
-		//free(temp_path);
 	}
 }
 
 void CSecretum17Dlg::OnBnClickedButton5()
 {
-	if (des.Make_keyfile()) {
+	if (block_al->Make_keyfile()) {
 		MessageBox(_T("Fail!! Not make keyfile"));
 	}
 	else {
@@ -271,6 +256,7 @@ void CSecretum17Dlg::OnBnClickedButton5()
 	
 }
 
+
 void CSecretum17Dlg::OnBnClickedEncodeBtn()
 {
 	if (check_file_flag == 0) {
@@ -278,20 +264,38 @@ void CSecretum17Dlg::OnBnClickedEncodeBtn()
 		return;
 	}
 
-	if (m_Radio == DES_MODE) {
+	if (algorithm == BLOCK) {
 
 		if (check_keyfile_flag == 0) {
 			MessageBox(_T("Please select key file..."));
 			return;
 		}
-		des.DES_encode();
+
+		/* 파일을 넘김 */
+		if (block_al->Get_file(file_name)) {
+			MessageBox(_T("get_file error"));
+		}
+
+		/* key 파일을 넘겨줌 */
+		if (block_al->Get_keyfile(keyfile_name)) {
+			MessageBox(_T("get_keyfile error"));
+		}
+
+		/* 암호화 */
+		block_al->Encryption();
 		MessageBox(_T("Success file encryption!"));
 	}
-	else if (m_Radio == MD5_MODE) {
-		CString str = CString::CStringT(CA2CT(md5.MD5_file().c_str()));
+	else if (algorithm == HASH) {
+
+		if (hash_al->Get_file(file_name)) {
+			MessageBox(_T("get_file error"));
+		}
+
+		/* 암호화 */
+		hash_al->Encryption();
+		CString str = CString::CStringT(CA2CT(hash_al->MD5_result.c_str()));
 		MessageBox(_T("MD5 File : ") + str);
 	}
-
 
 }
 
@@ -303,40 +307,48 @@ void CSecretum17Dlg::OnBnClickedDecodeBtn()
 		return;
 	}
 
-	if (m_Radio == DES_MODE) {
-		des.DES_decode(); 
+	/* 복호화 */
+	if (algorithm == BLOCK) {
+		block_al->Decryption();
 		MessageBox(_T("Success file decryption!"));
 	}
 }
 
-void CSecretum17Dlg::init_mode() {
+
+void CSecretum17Dlg::set_dialog(bool al) {
+
+	/* 텍스트 area 초기화 */
 	file_path_btn.SetWindowTextW(_T(""));
 	keyfile_name_edit.SetWindowTextW(_T(""));
-	des.input_file = NULL;
-	des.key_file = NULL;
-	md5.input_file = NULL;
+
+	/* mode에 따른 dialog 변환 */
+	keyfile_create_btn.EnableWindow(al);
+	keyfile_name_edit.EnableWindow(al);
+	keyfile_search_btn.EnableWindow(al);
+	keyfile_message.EnableWindow(al);
+	decryption_btn.EnableWindow(al);
 }
 
-void CSecretum17Dlg::set_dialog(bool al_mode) {
-
-	m_Radio = al_mode;
-	al_mode = !al_mode;
-	keyfile_create_btn.EnableWindow(al_mode);
-	keyfile_name_edit.EnableWindow(al_mode);
-	keyfile_search_btn.EnableWindow(al_mode);
-	keyfile_message.EnableWindow(al_mode);
-	decryption_btn.EnableWindow(al_mode);
-}
 
 void CSecretum17Dlg::OnBnClickedRadio1()
 {
-	init_mode();
-	set_dialog(DES_MODE);
+	set_dialog(BLOCK);
+	algorithm = BLOCK;
+	m_Radio = DES_MODE;	
 }
 
 
 void CSecretum17Dlg::OnBnClickedRadio2()
 {
-	init_mode();
-	set_dialog(MD5_MODE);
+	set_dialog(HASH);
+	algorithm = HASH;
+	m_Radio = MD5_MODE;
+}
+
+
+void CSecretum17Dlg::OnBnClickedRadio3()
+{
+	set_dialog(BLOCK);
+	algorithm = BLOCK;
+	m_Radio = AES_MODE;
 }
