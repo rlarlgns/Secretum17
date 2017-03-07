@@ -4,4 +4,10 @@
 
 #include "encryption_AL.h"
 
+class AES : public Block_AL {
+public:
+	AES() { cout << "AES" << endl; };
+	virtual ~AES() {};
+};
+
 #endif 

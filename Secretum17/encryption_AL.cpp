@@ -6,7 +6,7 @@
 bool get_keyfile(input_keyfile) : key 파일을 불러옴
 */
 bool Block_AL::Get_keyfile(char* input_keyfile) {
-	printf("%s\n", input_keyfile);
+	printf("Keyfile : %s\n", input_keyfile);
 	key_file = fopen(input_keyfile, "rb");
 	if (!key_file) {
 		printf("Get_keyfile error!\n");

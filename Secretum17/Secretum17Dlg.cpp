@@ -6,6 +6,7 @@
 
 #include "des.h"
 #include "md5.h"
+#include "aes.h"
 
 #include "Secretum17.h"
 #include "Secretum17Dlg.h"
@@ -24,8 +25,8 @@
 #endif
 
 /* 부모 클래스 포인터 선언 */
-Block_AL* block_al;
-Hash_AL* hash_al;
+Block_AL* block_al = NULL;
+Hash_AL* hash_al = NULL;
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
@@ -74,7 +75,7 @@ CSecretum17Dlg::CSecretum17Dlg(CWnd* pParent /*=NULL*/)
 void CSecretum17Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Radio(pDX, IDC_RADIO1, m_Radio);
+	DDX_Radio(pDX, IDC_RADIO1, (int&)m_Radio);
 	DDX_Control(pDX, IDC_KEY_FILEOPEN, keyfile_search_btn);
 	DDX_Control(pDX, IDC_BUTTON5, keyfile_create_btn);
 	DDX_Control(pDX, IDC_EDIT2, keyfile_name_edit);
@@ -96,9 +97,8 @@ BEGIN_MESSAGE_MAP(CSecretum17Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON5, &CSecretum17Dlg::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_ENCODE_BTN, &CSecretum17Dlg::OnBnClickedEncodeBtn)
 	ON_BN_CLICKED(IDC_DECODE_BTN, &CSecretum17Dlg::OnBnClickedDecodeBtn)
-	ON_BN_CLICKED(IDC_RADIO1, &CSecretum17Dlg::OnBnClickedRadio1)
-	ON_BN_CLICKED(IDC_RADIO2, &CSecretum17Dlg::OnBnClickedRadio2)
-	ON_BN_CLICKED(IDC_RADIO3, &CSecretum17Dlg::OnBnClickedRadio3)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, &CSecretum17Dlg::RadioCtrl)
+	
 END_MESSAGE_MAP()
 
 
@@ -139,7 +139,7 @@ BOOL CSecretum17Dlg::OnInitDialog()
 	setlocale(LC_ALL, "Korean");
 
 	/* radio btn 1 func click */
-	OnBnClickedRadio1();
+	RadioCtrl(0);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -236,10 +236,11 @@ void CSecretum17Dlg::OnBnClickedKeyFileopen()
 		CString m_filename = dlg.GetFileName();
 
 		/* CString -> char* 형변환 */
-		char* keyfile_name = (char*)malloc(m_filename.GetLength());
+		keyfile_name = (char*)malloc(m_filename.GetLength());
 		size_t CharactersConverted = 0;
 		wcstombs_s(&CharactersConverted, keyfile_name, m_filename.GetLength() + 1, m_filename, _TRUNCATE);
 		
+		cout << keyfile_name << endl;
 		/* 파일 체크 */
 		check_keyfile_flag = 1;
 	}
@@ -315,6 +316,17 @@ void CSecretum17Dlg::OnBnClickedDecodeBtn()
 }
 
 
+void CSecretum17Dlg::init_mode() {
+	if (block_al != NULL) {
+		delete(block_al);
+		block_al = NULL;
+	}
+	if (hash_al != NULL) {
+		delete(hash_al);
+		hash_al = NULL;
+	}
+}
+
 void CSecretum17Dlg::set_dialog(bool al) {
 
 	/* 텍스트 area 초기화 */
@@ -329,26 +341,37 @@ void CSecretum17Dlg::set_dialog(bool al) {
 	decryption_btn.EnableWindow(al);
 }
 
+void CSecretum17Dlg::RadioCtrl(UINT ID) {
+	UpdateData(TRUE);
+	
+	init_mode();
 
-void CSecretum17Dlg::OnBnClickedRadio1()
-{
-	set_dialog(BLOCK);
-	algorithm = BLOCK;
-	m_Radio = DES_MODE;	
+	switch (m_Radio) {
+
+	case 0: {
+		
+		set_dialog(BLOCK);
+		algorithm = BLOCK;
+		//m_Radio = DES_MODE;
+		block_al = new DES();
+		break;
+	}
+	case 1: {
+
+		set_dialog(HASH);
+		algorithm = HASH;
+		//m_Radio = MD5_MODE;
+		hash_al = new MD5();
+		break;
+	}
+	case 2: {
+
+		set_dialog(BLOCK);
+		algorithm = BLOCK;
+		//m_Radio = AES_MODE;
+		block_al = new AES();
+		break;
+	}
+	}
 }
 
-
-void CSecretum17Dlg::OnBnClickedRadio2()
-{
-	set_dialog(HASH);
-	algorithm = HASH;
-	m_Radio = MD5_MODE;
-}
-
-
-void CSecretum17Dlg::OnBnClickedRadio3()
-{
-	set_dialog(BLOCK);
-	algorithm = BLOCK;
-	m_Radio = AES_MODE;
-}

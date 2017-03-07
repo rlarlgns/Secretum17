@@ -3,7 +3,6 @@
 //
 
 #include "stdafx.h"
-#include "wrapper.h"
 #include "Secretum17.h"
 #include "Secretum17Dlg.h"
 

@@ -32,8 +32,8 @@ public:
 	Block_AL() { cout << "Block Algorithm" << " -> "; };
 	virtual ~Block_AL() {};
 
-	virtual void Encryption();
-	virtual void Decryption();
+	virtual void Encryption() {};
+	virtual void Decryption() {};
 
 	bool Get_file(char* input_file);
 	bool Get_keyfile(char* input_keyfile);
@@ -51,7 +51,7 @@ public:
 	Hash_AL() { cout << "Hash Algorithm" << " -> "; };
 	virtual ~Hash_AL() {};
 
-	virtual void Encryption();
+	virtual void Encryption() {};
 
 	bool Get_file(char* input_file);
 

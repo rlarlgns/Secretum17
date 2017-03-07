@@ -38,6 +38,7 @@ public:
 	afx_msg void OnBnClickedButton5();
 	afx_msg void OnBnClickedEncodeBtn();
 	afx_msg void OnBnClickedDecodeBtn();
+	afx_msg void RadioCtrl(UINT ID);
 
 	/* 파일 세팅 체크 */
 	bool check_file_flag = 0, check_keyfile_flag = 0;
@@ -47,8 +48,7 @@ public:
 	char *file_name, *keyfile_name;
 
 	int m_Radio;
-	afx_msg void OnBnClickedRadio1();
-	afx_msg void OnBnClickedRadio2();
+
 	CButton keyfile_search_btn;
 	CButton keyfile_create_btn;
 	CEdit keyfile_name_edit;
@@ -60,7 +60,6 @@ public:
 	void set_dialog(bool al);
 	CButton encryption_btn;
 	CButton decryption_btn;
-	void init_mode(int current, int al_mode);
-	afx_msg void OnEnChangeEdit2();
-	afx_msg void OnBnClickedRadio3();
+	void init_mode();
+
 };
