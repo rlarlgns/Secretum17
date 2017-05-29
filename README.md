@@ -55,7 +55,7 @@ _DES : <https://github.com/tarequeh/DES>_
 
 ### 2.2 프로젝트 알고리즘 구현
 
-![알고리즘 순서도]({{site.url}}/img/secretum17/1.png)
+![알고리즘 순서도](/img/secretum17/1.png)
 
 본 프로그램은 암호화 알고리즘에 따라서 파일을 암호화, 복호화 하는 프로그램으로서 위와 같은 동작으로 진행이 된다. 먼저 해당 파일을 어떠한 알고리즘을 통해서 암호화를 할 것인지 선택을 한다. 암호화는 블록 암호화 알고리즘인 DES와 해쉬 암호화 알고리즘인 MD5가 있다.
 
@@ -69,14 +69,14 @@ _DES : <https://github.com/tarequeh/DES>_
 
 #### 1) DES algorithm
 
-![DES-main-network, DES-key-schedule]({{site.url}}/img/secretum17/2.png)  
+![DES-main-network, DES-key-schedule](/img/secretum17/2.png)  
 
 DES 알고리즘은 64bits의 평문(plaintext)를 Key를 이용하여 64bits의 암호문을 생성한다. Feistel Cipher 방식으로, 요약하자면 평문은 두 개로 나누어 반복되는 라운드 함수와 대응되는 라운드 키를 통해서 암호학적으로 강한 함수를 만드는 과정이다.
 
 ##### Main process
 
   1.	64 bit 평문 IP( Initial Permutation ) 수행  
-  ![Initial permutation, IP table]({{site.url}}/img/secretum17/3.png)  
+  ![Initial permutation, IP table](/img/secretum17/3.png)  
   초기의 64 bit의 평문을 치환하는 작업으로 bit의 순서를 미리 지정된 table에 맞추어 지정한다. 예를 들어 IP table에서 첫 인덱스의 58은 출력될 첫 번째 비트가 평문의 58번째 비트가 된다는 의미이다.
 
   2.	좌우 32 bit로 나뉘어 round 진행  
@@ -92,7 +92,7 @@ DES 알고리즘은 64bits의 평문(plaintext)를 Key를 이용하여 64bits의
   바뀐 ro, lo는 다시 과정 2로 돌아가 16라운드의 작업을 진행한다.
 
   6.	IP^-1( Inverse Permutation )을 수행 후 암호문 출력  
- ![Final permutation ( IP^-1 ), IP^-1 table]({{site.url}}/img/secretum17/4.png)  
+ ![Final permutation ( IP^-1 ), IP^-1 table](/img/secretum17/4.png)  
   초기의 치환 작업과 같은 방식으로 진행되며 IP^-1의 table에 맞게 값이 지정 된다. 다음과 같은 작업을 모두 마치고 나면 암호화된 평문이 출력된다.
 
 -----------
@@ -102,36 +102,36 @@ DES 알고리즘은 64bits의 평문(plaintext)를 Key를 이용하여 64bits의
 각 라운드 마다 서로 다른 round key가 필요로 하는데 이를 만드는 과정을 key 스케줄링 이라고 한다. 64bit의 key를 입력 받아서 16개의 round key를 만들어낸다.
 
   1.	PC 1 수행 ( Permuted Choice 1 ) 후 둘로 나눔  
-![Permuted choice 1, PC 1 left, right]({{site.url}}/img/secretum17/5.png)  
+![Permuted choice 1, PC 1 left, right](/img/secretum17/5.png)  
   초기의 64bit key는 PC1을 수행하면서 left 28bit, right 28bit로 나누어진다. 테이블의 left, right는 어떠한 비트가 스케줄 과정에서 지정되는지를 보여준다. 64bit에서 58bit만을 선택하여 수행이 되는데 나머지 비트( 8, 16, 24, 32, 40, 48, 56, 64 )는 패리티 비트로 사용되도록 지정된다. 패리티 비트는 정보 전달 과정에서 오류가 생겼는지를 검사하기 위한 비트이다.
 
   2.	라운드 별 shift 연산 수행  
-  ![Rotations in the key-schedule]({{site.url}}/img/secretum17/6.png)  
+  ![Rotations in the key-schedule](/img/secretum17/6.png)  
 28bit의 left, right는 라운드 별로 각기 다른 shift 연산을 수행하게 된다. 위의 표는 라운드 별 shift 횟수이다.
 
   3.	PC 2 수행 ( Permuted Choice 2 ) 및 key 생성  
-![Permuted choice 2, PC 2 table]({{site.url}}/img/secretum17/7.png)  
+![Permuted choice 2, PC 2 table](/img/secretum17/7.png)  
   PC 2는 shift 연산을 마친 56bit( left, right )에서 48bit를 선택하여 round key를 출력하는 구문이다. 이전의 과정과 비슷하게 테이블에서 해당 비트 값을 지정하여 출력한다. 16 개의 라운드를 거치며 16개의 key가 생성된다.
 
 ------------
 
 ##### F 함수  
 
-![DES-f function]({{site.url}}/img/secretum17/8.png)  
+![DES-f function](/img/secretum17/8.png)  
 
 1.	ro 32bit E( expension ) 함수 수행  
- ![Expansion function, Etable]({{site.url}}/img/secretum17/9.png)  
+ ![Expansion function, Etable](/img/secretum17/9.png)  
 	E( ecpention )작업은 32 bit ro를 48bit로 늘려주는 확장 함수이다.
 
 2.	48bit round key와 ro 48bit XOR 연산 수행  
 	키 스케줄링 작업을 통해서 생성된 라운드 키와 E 함수를 수행한 ro가 XOR 연산을 수행한다.
 
 3.	S-Box 작업 수행  
-  ![S-Boxs]({{site.url}}/img/secretum17/10.png)  
+  ![S-Boxs](/img/secretum17/10.png)  
 	XOR 연산 후 48bit는 8개로 나누어져 S-Box 연산을 수행한다. 8개의 S-Box는 6bit의 입력을 4bit 출력으로 대체한다. 6bit의 입력이 주어지면 외부 2bit를 사용하여 행을 선택하고 내부의 4bit를 사용하여 4bit 출력을 찾는다. 예를 들어, 입력 “011010”은 외부 비트 “00” 및 내부 비트 “1101”을 갖는다. 해당 위치의 S-box의 값이 출력 되고 8개의 S-box에서 4bit가 출력되어 32bit의 값이 생성된다.
 
 4.	P( Permutation ) 작업 수행 및 결과 값 출력  
-  ![P permutation, P table]({{site.url}}/img/secretum17/11.PNG)  
+  ![P permutation, P table](/img/secretum17/11.PNG)  
 	함수 P는 S-box의 결과값 32bit를 다시 한 번 섞어서 결과 값으로 출력한다.
 
 -----------
@@ -147,22 +147,22 @@ MD5는 128bit 암호화 해시 함수이며 주로 프로그램이나 파일이 
 	1의 과정을 수행하고 남은 64bit를 추가하는 작업이다. 패딩이 되기 전 원본 메시지의 길이를 입력하는 부분으로 2개의 32bit로 구성이 되어있다. little-endian 방식이기 때문에 낮은 바이트가 위쪽에 위치하는 모양을 취한다.
 
 3.	Initialize MD Buffer  
- ![MD Buffer 초기화 값]({{site.url}}/img/secretum17/12.png)  
+ ![MD Buffer 초기화 값](/img/secretum17/12.png)  
 	MD5 알고리즘은 128bit의 출력 값을 가진다. MD buffer은 출력 값을 저장하고 있는 4개의 32bit 레지스터 이다. 해당 버퍼는 특정한 값으로 초기화 되어있고 이 역시 little-endian 형태로 저장되어 있다.  
 
 4.	Process Message in 16-Word Blocks  
-  ![단일 MD5 연산]({{site.url}}/img/secretum17/13.png)  
+  ![단일 MD5 연산](/img/secretum17/13.png)  
 	실질적인 message digest를 진행하는 부분으로 16word( 512bit )단위로 수행된다. 메인 알고리즘은 A, B, C, D라고 이름이 붙은 128 bit state에 대하여 동작을 한다. 각 state는 다시 4개의 32bit(1 word)로 이루어져 있다. MD5에서는 위의 단일 연산을 64번 실행한다. 16개의 연산을 1개의 라운드로 묶어 총 4개의 라운드로 구성이 된다.  
-  ![보조 함수 F 연산]({{site.url}}/img/secretum17/14.png)  
+  ![보조 함수 F 연산](/img/secretum17/14.png)  
 MD5를 수행하기 위해 필요한 요소로는 보조함수 F, 입력 메시지의 32비트 블록 M, K, 레프트 로테이션 <<<로 구성 되어있다. 그림의 Addition 기호는 모듈로 2^32 덧셈을 말한다. 함수 F는 각 라운드에서 사용하는 비 선형함수를 의미한다. 보조함수 F는 각 라운드마다 다르게 F, G, H, I로 정의되어 있다. 순서대로 XOR, 논리곱, 논리합, NOT 연산을 의미한다.  
-  ![1 Round 의사 코드]({{site.url}}/img/secretum17/15.png)  
+  ![1 Round 의사 코드](/img/secretum17/15.png)  
 	각 라운드는 다음과 같은 구성으로 이루어져 있으며 보조함수의 종류만 달라진다. a, b, c, d가 state 블록이 이고 s는 left shift의 횟수를 의미한다. T는 라디안 값을 의미하는데 미리 지정된 값을 사용한다. X는 bit 단위의 블록을 연산을 위해 word 단위의 블록으로 변환한 것으로 X[16]으로 설명할 수 있다.
 
 -------------
 
 ### 2.3 객체 지향적 코드 구현
 
-![프로젝트 클래스 다이어그램]({{site.url}}/img/secretum17/16.png)  
+![프로젝트 클래스 다이어그램](/img/secretum17/16.png)  
 클래스는 3개로 구성되어 있으며 두 암호화 알고리즘 MD5와 DES가 클래스로 구성되어있고 Wrapper 클래스를 상속받아서 두 클래스에서 공통적으로 처리하는 일을 수행하도록 하였다.
 
 1) Wrapper class
@@ -193,7 +193,7 @@ process_message는 8byte의 원본 messeage_piece와 key_set을 입력 받아서
 
 ### 2.4 UI 구성
 
-![프로그램 UI DES, MD5]({{site.url}}/img/secretum17/17.PNG)  
+![프로그램 UI DES, MD5](/img/secretum17/17.PNG)  
 본 프로그램은 MFC를 사용하여 UI를 구성하였다. 기본적으로 파일에 대한 암호화를 수행하여서 암호화 또는 복호화 할 파일을 입력받을 창이 존재한다. DES 알고리즘은 대칭키 기반으로 동작하기 때문에 key file을 선택할 수 있도록 박스를 구성하였고 그 안에 임시키 파일을 생성할 수 있는 버튼을 마련하였다. 암호화, 복호화 된 결과물은 파일로 출력이 된다.
 
 MD5의 경우에 key file을 필요로 하지 않기 때문에 오류 발생을 막기 위해 예외처리를 하였고 Decryption 역시 버튼을 비활성화 시켜 두었다. DES와 다르게 출력 결과는 메시지박스에 128bit의 문자열로 출력이 되도록 하였다.
