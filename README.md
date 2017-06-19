@@ -8,7 +8,7 @@ Secretum17
 개발 환경 : Window 10 x64, Visual studio 2015  
 소스 코드 : <https://github.com/rlarlgns/Secretum17>
 
--------
+---
 
 목차
 ---
@@ -22,10 +22,10 @@ Secretum17
 
   3. 결과 및 성과  
 
-----------
+---
 
 1.개요
-----
+---
 
 본 프로젝트는 C++ 암호화 프로그램을 제작하면서 기본적인 암호화 알고리즘에 대한 이해와 객체지향 프로그래밍을 실습하는 것을 목표로 한다. DES 블록 암호화 알고리즘과 MD5 해쉬 암호화 알고리즘을 기반으로 객체 지향적 코드를 설계 및 구현하도록 노력하였으며 MFC를 사용하여 간단한 UI를 적용하였다.
 
@@ -33,10 +33,10 @@ Secretum17
 _MD5 : <https://www.ietf.org/rfc/rfc1321.txt>_  
 _DES : <https://github.com/tarequeh/DES>_
 
--------------
+---
 
 2.개발 내용
------------
+---
 ### 2.1 개발 목표
 
   1. 객체 지향 프로그래밍 캡슐화, 상속, 다형성을 보장  
@@ -51,7 +51,7 @@ _DES : <https://github.com/tarequeh/DES>_
   4. 프로그램의 세부적인 예외처리 구현  
   	알고리즘 및 UI 코드에서 에러가 발생하지 않도록 세부적인 예외처리를 한다.
 
---------
+---
 
 ### 2.2 프로젝트 알고리즘 구현
 
@@ -65,7 +65,7 @@ _DES : <https://github.com/tarequeh/DES>_
 
 다음으로 본 프로젝트에서 사용된 두 알고리즘을 설명하고 어떠한 방식, 코드로 구현되었는지를 보인다.
 
-----------
+---
 
 #### 1) DES algorithm
 
@@ -95,7 +95,7 @@ DES 알고리즘은 64bits의 평문(plaintext)를 Key를 이용하여 64bits의
  ![Final permutation ( IP^-1 ), IP^-1 table](/img/secretum17/4.png)  
   초기의 치환 작업과 같은 방식으로 진행되며 IP^-1의 table에 맞게 값이 지정 된다. 다음과 같은 작업을 모두 마치고 나면 암호화된 평문이 출력된다.
 
------------
+---
 
 ##### Key schedulling
 
@@ -113,7 +113,7 @@ DES 알고리즘은 64bits의 평문(plaintext)를 Key를 이용하여 64bits의
 ![Permuted choice 2, PC 2 table](/img/secretum17/7.png)  
   PC 2는 shift 연산을 마친 56bit( left, right )에서 48bit를 선택하여 round key를 출력하는 구문이다. 이전의 과정과 비슷하게 테이블에서 해당 비트 값을 지정하여 출력한다. 16 개의 라운드를 거치며 16개의 key가 생성된다.
 
-------------
+---
 
 ##### F 함수  
 
@@ -134,7 +134,7 @@ DES 알고리즘은 64bits의 평문(plaintext)를 Key를 이용하여 64bits의
   ![P permutation, P table](/img/secretum17/11.PNG)  
 	함수 P는 S-box의 결과값 32bit를 다시 한 번 섞어서 결과 값으로 출력한다.
 
------------
+---
 
 #### 2) MD5 알고리즘
 
@@ -158,38 +158,29 @@ MD5를 수행하기 위해 필요한 요소로는 보조함수 F, 입력 메시�
   ![1 Round 의사 코드](/img/secretum17/15.png)  
 	각 라운드는 다음과 같은 구성으로 이루어져 있으며 보조함수의 종류만 달라진다. a, b, c, d가 state 블록이 이고 s는 left shift의 횟수를 의미한다. T는 라디안 값을 의미하는데 미리 지정된 값을 사용한다. X는 bit 단위의 블록을 연산을 위해 word 단위의 블록으로 변환한 것으로 X[16]으로 설명할 수 있다.
 
--------------
+---
 
 ### 2.3 객체 지향적 코드 구현
 
 ![프로젝트 클래스 다이어그램](/img/secretum17/16.png)  
 클래스는 3개로 구성되어 있으며 두 암호화 알고리즘 MD5와 DES가 클래스로 구성되어있고 Wrapper 클래스를 상속받아서 두 클래스에서 공통적으로 처리하는 일을 수행하도록 하였다.
 
-1) Wrapper class
-
-래퍼 클래스는 두 암호화 클래스에서 공통적으로 처리하는 파일을 불러오는 일을 주로 수행하도록 하였다. 두 암호화 클래스가 Wrapper class를 상속받는 것으로 해당 기능을 사용할 수 있도록 하였다. 그리고 부가적으로 임시키를 발급해주는 기능을 추가하였다. 변수로는 input_file, output_file, key_file로 구성되어 있다.
-
-Get_file() 함수는 암호화 할 파일을 가져오는 메소드로 fopen 과 같은 함수를 사용하여 작성되었다. Get_keyfile() 역시 동일한 작업을 하지만 .key 파일만을 받아들이게 하여 간단한 예외 처리를 해 주었다. Make_keyfile()은 사용자가 .key 파일이 없을 경우 임시키를 발급받을 수 있도록 rand함수를 사용하여 제작한 함수이다.
-
-wrapper의 상속으로 md5 클래스에 사용하지 않는 변수가 상속되는 문제가 있는데 조금 더 객체지향 적인 코드 수정이 필요하다.
-
-2) MD5
-
-MD5 클래스는 message digest를 위해서 필요한 변수 state, count, buffer, PADDING이 존재하며 자료형인 bit32, byte는 자료형의 크기를 직관적으로 보기 위해서 정의하였다.
-
-Encode(), Decode() 함수는 알고리즘을 수행하면서 자료형을 원활하게 바꾸기 위해서 정의 되었다. Encode()의 경우 32bit input을 1byte의 output으로 변환하는 함수이고 Decode()는 1byte input을 32bits output으로 변환하는 함수이다. Encode()의 경우에는 little-endian 방식으로 작동하는 알고리즘의 특성에 맞도록 변환해주는 구문이 포함되어 있다.
-
-MD5_init()의 경우 변수들의 초기화 작업을 수행하고 실직적인 알고리즘은 MD5_update()와 MD5_final()에서 동작한다. MD5 process는 Step1 ~ 5까지 순서대로 진행되는 반면 실질적인 코드 구현 순서는 조금 다르다. Step1 Append Padding Bits와 Step2 Append Length는 MD5_final() 함수에서 동작하며 Step3과 Step4의 과정을 수행한 뒤 진행한다. MD5_transform() 함수에서는 Step4 Process message in 16-word Block가 수행되며 실질적인 main 알고리즘이 되겠다.
-
-3) DES
-
-DES 클래스는 크게 key 스케줄링을 주관하는 부분과 메시지를 암호화 하는 부분으로 이루어진다. 치환 작업이 많은 알고리즘으로 치환을 위한 테이블을 변수로 지정하여 관리하였다. key_ip, sub_key_permutation, message_ip, message_expension, message_final_ip와 같은 table이 위치하고 있다.
-
-Generate_sub_key() 함수는 사용자에게 64bit key를 입력 받아 16개의 48bit round key를 만드는 작업을 수행한다. PC1, PC2, shift 연산 작업을 수행한다. Set_DES() 에서는 암, 복호화를 위한 변수들을 초기화 하는 작업을 한다.
-
-process_message는 8byte의 원본 messeage_piece와 key_set을 입력 받아서 암호화 또는 복호화 된 메시지를 출력하게 된다. DES_encode(), DES_decode() 함수는 Wrapper 클래스에서 파일을 입력 받고 해당 파일을 8 byte 씩 읽어 들이면서 암호화, 복호화 하는 작업을 수행한다.
-
-----------
+1) Wrapper class  
+래퍼 클래스는 두 암호화 클래스에서 공통적으로 처리하는 파일을 불러오는 일을 주로 수행하도록 하였다. 두 암호화 클래스가 Wrapper class를 상속받는 것으로 해당 기능을 사용할 수 있도록 하였다. 그리고 부가적으로 임시키를 발급해주는 기능을 추가하였다. 변수로는 input_file, output_file, key_file로 구성되어 있다.  
+Get_file() 함수는 암호화 할 파일을 가져오는 메소드로 fopen 과 같은 함수를 사용하여 작성되었다. Get_keyfile() 역시 동일한 작업을 하지만 .key 파일만을 받아들이게 하여 간단한 예외 처리를 해 주었다. Make_keyfile()은 사용자가 .key 파일이 없을 경우 임시키를 발급받을 수 있도록 rand함수를 사용하여 제작한 함수이다.  
+wrapper의 상속으로 md5 클래스에 사용하지 않는 변수가 상속되는 문제가 있는데 조금 더 객체지향 적인 코드 수정이 필요하다.  
+  
+2) MD5  
+MD5 클래스는 message digest를 위해서 필요한 변수 state, count, buffer, PADDING이 존재하며 자료형인 bit32, byte는 자료형의 크기를 직관적으로 보기 위해서 정의하였다.    
+Encode(), Decode() 함수는 알고리즘을 수행하면서 자료형을 원활하게 바꾸기 위해서 정의 되었다. Encode()의 경우 32bit input을 1byte의 output으로 변환하는 함수이고 Decode()는 1byte input을 32bits output으로 변환하는 함수이다. Encode()의 경우에는 little-endian 방식으로 작동하는 알고리즘의 특성에 맞도록 변환해주는 구문이 포함되어 있다.    
+MD5_init()의 경우 변수들의 초기화 작업을 수행하고 실직적인 알고리즘은 MD5_update()와 MD5_final()에서 동작한다. MD5 process는 Step1 ~ 5까지 순서대로 진행되는 반면 실질적인 코드 구현 순서는 조금 다르다. Step1 Append Padding Bits와 Step2 Append Length는 MD5_final() 함수에서 동작하며 Step3과 Step4의 과정을 수행한 뒤 진행한다. MD5_transform() 함수에서는 Step4 Process message in 16-word Block가 수행되며 실질적인 main 알고리즘이 되겠다.    
+  
+3) DES  
+DES 클래스는 크게 key 스케줄링을 주관하는 부분과 메시지를 암호화 하는 부분으로 이루어진다. 치환 작업이 많은 알고리즘으로 치환을 위한 테이블을 변수로 지정하여 관리하였다. key_ip, sub_key_permutation, message_ip, message_expension, message_final_ip와 같은 table이 위치하고 있다.  
+Generate_sub_key() 함수는 사용자에게 64bit key를 입력 받아 16개의 48bit round key를 만드는 작업을 수행한다. PC1, PC2, shift 연산 작업을 수행한다. Set_DES() 에서는 암, 복호화를 위한 변수들을 초기화 하는 작업을 한다.  
+process_message는 8byte의 원본 messeage_piece와 key_set을 입력 받아서 암호화 또는 복호화 된 메시지를 출력하게 된다. DES_encode(), DES_decode() 함수는 Wrapper 클래스에서 파일을 입력 받고 해당 파일을 8 byte 씩 읽어 들이면서 암호화, 복호화 하는 작업을 수행한다.  
+  
+---
 
 ### 2.4 UI 구성
 
